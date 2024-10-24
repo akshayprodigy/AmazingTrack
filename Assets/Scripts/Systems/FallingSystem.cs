@@ -34,7 +34,7 @@ namespace AmazingTrack
                     fallingComponent.Falling = true;
                 }
                 
-                if (fallingComponent.FallingDelay <= -2.0f)
+                if (fallingComponent.FallingDelay <= -1 * fallingComponent.FallingTime)
                     spawner.DespawnObject(entity);
             }
         }

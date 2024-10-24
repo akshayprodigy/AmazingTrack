@@ -131,11 +131,11 @@ namespace AmazingTrack
 
         private void FallDownBlock(int block)
         {
-            fallingPool.Add(block) = new FallingComponent { FallingDelay = 0.3f };
+            fallingPool.Add(block) = new FallingComponent { FallingDelay = 0.3f, FallingTime = 2.0f };
 
             ref var blockComponent = ref blockPool.Get(block);
             if (blockComponent.Crystal != null && blockComponent.Crystal.Value.Unpack(world, out int crystal))
-                fallingPool.Add(crystal) = new FallingComponent { FallingDelay = 0.4f };
+                fallingPool.Add(crystal) = new FallingComponent { FallingDelay = 0.4f, FallingTime = 2.0f };
         }
     }
 }

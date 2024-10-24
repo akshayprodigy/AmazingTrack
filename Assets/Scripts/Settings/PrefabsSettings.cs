@@ -10,5 +10,6 @@ namespace AmazingTrack
         public GameObject BlockPartPrefab;
         public GameObject BlockPrefab;
         public GameObject CrystalPrefab;
+        public GameObject particleEffectPrefab;
     }
 }

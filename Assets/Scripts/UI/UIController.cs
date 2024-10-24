@@ -8,6 +8,7 @@ namespace AmazingTrack
     {
         [SerializeField] GameObject titleUI;
         [SerializeField] GameObject playingUI;
+        [SerializeField] GameObject gameOverUI;
         [SerializeField] GameObject gameEndUI;
         
         [Inject]
@@ -20,7 +21,7 @@ namespace AmazingTrack
         {
             uiDictionary = new Dictionary<GameState, GameObject>
             {
-                { GameState.Title, titleUI }, { GameState.Playing, playingUI }, { GameState.GameEnd, gameEndUI }
+                { GameState.Title, titleUI }, { GameState.Playing, playingUI }, { GameState.Revive, gameOverUI } , { GameState.GameEnd, gameEndUI }
             };
         }
 

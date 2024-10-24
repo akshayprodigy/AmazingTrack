@@ -5,12 +5,14 @@
         Title,
         Playing,
         GameOver,
-        GameEnd
+        GameEnd,
+        Revive
     }
     
     public struct GameStateComponent
     {
         public GameState State;
         public float GameOverTimer;
+        public float ReviveTimer;
     }
 }

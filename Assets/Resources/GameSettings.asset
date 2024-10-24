@@ -17,12 +17,16 @@ MonoBehaviour:
     GameMode: 1
     Level: 1
     RandomCrystals: 0
-    BackgroundColor1: {r: 0.7058824, g: 0.36862746, b: 0.36862746, a: 1}
-    BackgroundColor2: {r: 0.39215687, g: 0.39215687, b: 0.7372549, a: 1}
+    BackgroundColorTop1: {r: 0.18431373, g: 0.8666667, b: 0.42745098, a: 1}
+    BackgroundColorBottom1: {r: 0.83137256, g: 0.23137255, b: 0.42745098, a: 1}
+    BackgroundColorTop2: {r: 0, g: 0.36917162, b: 1, a: 1}
+    BackgroundColorBottom2: {r: 0.8679245, g: 0.8297515, b: 0.23335704, a: 1}
     BackgroundChangeDuration: 5
+    CameraLerpRate: 5
     CrystalMask:
       serializedVersion: 2
       m_Bits: 64
+    SkyboxMaterial: {fileID: 2100000, guid: a2828637b98de420897427af06bdab8f, type: 2}
   AudioPlayer:
     BallHitCrystalSound: {fileID: 8300000, guid: b6039e869b88dfe449ea7e1b11ca2a4c,
       type: 3}

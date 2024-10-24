@@ -32,7 +32,9 @@ namespace AmazingTrack
             Container.Bind<AudioPlayer>().AsSingle();
             Container.Bind<PlayerStatService>().AsSingle();
             Container.BindInterfacesAndSelfTo<GameSystem>().AsSingle();
-            Container.BindInterfacesAndSelfTo<CrystalSystem>().AsSingle();
+            Container.BindInterfacesAndSelfTo<CrystalSystem>().AsSingle()
+            .WithArguments(Prefabs.particleEffectPrefab)
+            .NonLazy();
             
             Container.BindInterfacesTo<DeleteEventsSystem<BallPassedComponent>>().AsSingle();
             Container.BindInterfacesTo<DeleteEventsSystem<BallHitComponent>>().AsSingle();

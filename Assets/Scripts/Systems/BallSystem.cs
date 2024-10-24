@@ -49,6 +49,10 @@ namespace AmazingTrack
                 return; // can't change direction when fall
 
             ref var ballComponent = ref ballPool.Get(ball);
+            if(ballComponent.LastFallingDirection != Vector3.zero) {
+                ballComponent.Direction = ballComponent.LastFallingDirection == Vector3.forward ? -Vector3.left : Vector3.forward;
+                ballComponent.LastFallingDirection = Vector3.zero;
+            }else 
             ballComponent.Direction = ballComponent.Direction == Vector3.forward ? -Vector3.left : Vector3.forward;
 
             audioPlayer.Play(audioSettings.BallTurnSound);
@@ -66,13 +70,14 @@ namespace AmazingTrack
 
             if (ballComponent.Direction == Vector3.zero)
                 return;
+                
             
             ref var viewLinkComponent = ref viewLinkPool.Get(ball);
+            // var position = viewLinkComponent.Transform.position;
             
             if (!fallingPool.Has(ball))
             {
                 var position = viewLinkComponent.Transform.position;
-                
                 if (CheckCollisionWithCrystal(position, out int crystal) && crystalPool.Has(crystal))
                     ballHitCrystalPool.Add(crystal);
 
@@ -87,12 +92,74 @@ namespace AmazingTrack
                 }
                 else
                 {
-                    fallingPool.Add(ball) = new FallingComponent { FallingDelay = 0.0f };
+                    ballComponent.LastFallingDirection = ballComponent.Direction;
+                    fallingPool.Add(ball) = new FallingComponent { FallingDelay = 0.0f, FallingTime = 12.0f };
                 }
             }
 
             float speed = !fallingPool.Has(ball) ? ballComponent.Speed : 1;
             viewLinkComponent.Transform.Translate(ballComponent.Direction * speed * Time.deltaTime);
+        }
+
+        public void ResetBall(int ball)
+        {
+            Debug.Log("Resetting ball position to the center of the last block.");
+            ref var ballComponent = ref ballPool.Get(ball);
+            ref var viewLinkComponent = ref viewLinkPool.Get(ball);
+
+            if (fallingPool.Has(ball))
+            {
+                // Remove the falling component since the ball is being reset
+                fallingPool.Del(ball);
+            }
+            
+
+            // If the ball has a previous hit block, reset its position to the center of that block
+            if (ballComponent.PreviousHitEntity.HasValue)
+            {
+                int blockEntity = ballComponent.PreviousHitEntity.Value;
+
+                if (viewLinkPool.Has(blockEntity))
+                {
+                     ref var blockViewLink = ref viewLinkPool.Get(blockEntity);
+
+                    // Get the child count of the block
+                    int childCount = blockViewLink.Transform.childCount;
+
+                    if (childCount > 0)
+                    {
+                        // Determine the middle child
+                        int middleChildIndex = childCount / 2;
+
+                        // Get the middle child's transform
+                        Transform middleChild = blockViewLink.Transform.GetChild(middleChildIndex);
+
+                        // Log the position of the middle child
+                        Debug.Log($"Middle Child - Name: {middleChild.name}, Position: {middleChild.position}");
+
+                        // Reset ball position to the position of the middle child
+                        viewLinkComponent.Transform.position = new Vector3(middleChild.position.x, middleChild.position.y + 0.75f, middleChild.position.z); // Add height offset if needed to place above the child
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Block entity has no children, unable to reset ball position.");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("Block entity does not have a view link, unable to reset ball position.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("No previous block entity found, unable to reset ball position.");
+            }
+
+            // Reset direction to zero or a default direction if needed
+            ballComponent.Direction = Vector3.zero;
+            // Time.timeScale = 0f;
+            viewLinkComponent.Transform.GetComponent<Rigidbody>().isKinematic = true;
+            Debug.Log("Ball has been reset to the center of the last block.");
         }
 
         private bool CheckEntityUnder(Vector3 position, out int hitEntity)

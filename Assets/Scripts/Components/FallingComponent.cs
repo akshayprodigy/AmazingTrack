@@ -4,5 +4,7 @@
     {
         public float FallingDelay;
         public bool Falling;
+
+        public float FallingTime;
     }
 }

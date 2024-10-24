@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
@@ -6,15 +7,24 @@ namespace AmazingTrack
 {
     public class PlayingUI : MonoBehaviour
     {
-        [SerializeField] Text scoreText;
-        [SerializeField] Text highScoreText;
-        [SerializeField] Text levelText;
+
+        [SerializeField] TextMeshProUGUI coinText;
+        [SerializeField] TextMeshProUGUI healthText;
+        [SerializeField] TextMeshProUGUI scoreText;
+        [SerializeField] GameObject TutorialText;
         
         private int score;
+        private int crystalScore;
         private int highScore;
+        private int health;
         private int level;
 
         [Inject] private PlayerStatService playerStatService;
+
+        void OnEnable()
+        {
+            TutorialText.SetActive(true);
+        }
         
         private void Update()
         {
@@ -22,21 +32,26 @@ namespace AmazingTrack
             
             if (playerStatComponent.Score != score)
             {
-                scoreText.text = "Score: " + playerStatComponent.Score;
+                if(TutorialText.activeSelf){
+                    TutorialText.SetActive(false);
+                }
+                scoreText.text = "" + playerStatComponent.Score;
                 score = playerStatComponent.Score;
+                
             }
 
-            if (playerStatComponent.HighScore != highScore)
+            if (playerStatComponent.CrystalScore != crystalScore)
             {
-                highScoreText.text = "High: " + playerStatComponent.HighScore;
-                highScore = playerStatComponent.HighScore;
+                coinText.text = "" + playerStatComponent.CrystalScore;
+                crystalScore = playerStatComponent.CrystalScore;
             }
 
-            if (playerStatComponent.Level != level)
+            if (playerStatComponent.HealthScore != health)
             {
-                levelText.text = "Level: " + playerStatComponent.Level;
-                level = playerStatComponent.Level;
+                healthText.text = "" + playerStatComponent.HealthScore;
+                health = playerStatComponent.HealthScore;
             }
+
         }
     }
 }
