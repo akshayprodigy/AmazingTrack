@@ -46,6 +46,7 @@ namespace AmazingTrack
                 crystalScore = playerStatComponent.CrystalScore;
             }
 
+            Debug.Log("HealthScore: " + playerStatComponent.HealthScore + " Health: " + health);
             if (playerStatComponent.HealthScore != health)
             {
                 healthText.text = "" + playerStatComponent.HealthScore;

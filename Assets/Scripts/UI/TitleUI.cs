@@ -14,6 +14,8 @@ namespace AmazingTrack
 
         [SerializeField] TextMeshProUGUI coinText;
         [SerializeField] TextMeshProUGUI healthText;
+        [SerializeField] GameObject RewardHealthButton;
+        [SerializeField] GameObject IAPButton;
 
         public void OnEasyButtonClick()
         {
@@ -25,6 +27,7 @@ namespace AmazingTrack
             }
             playerStatComponent.LastGameMode = GameMode.Easy;
             playerStatComponent.HealthScore--;
+            playerStatComponent.IsGameFromClicked = true;
         }
 
         public void OnNormalButtonClick()
@@ -38,6 +41,7 @@ namespace AmazingTrack
             }
             playerStatComponent.LastGameMode = GameMode.Normal;
             playerStatComponent.HealthScore--;
+            playerStatComponent.IsGameFromClicked = true;
         }
 
         public void OnHardButtonClick()
@@ -50,6 +54,7 @@ namespace AmazingTrack
             }
             playerStatComponent.LastGameMode = GameMode.Hard;
             playerStatComponent.HealthScore--;
+            playerStatComponent.IsGameFromClicked = true;
         }
 
         public void OnHolesButtonClick()
@@ -62,11 +67,21 @@ namespace AmazingTrack
             }
             playerStatComponent.LastGameMode = GameMode.Holes;
             playerStatComponent.HealthScore--;
+            playerStatComponent.IsGameFromClicked = true;
         }
 
         public void OnPlayButtonClick()
         {
-            AdjustDifficultyBasedOnPlayerPerformance();
+            // UnityAdsManager.Instance.LoadRewardedVideo();
+            // UnityAdsManager.Instance.LoadInterstitial();
+            ref var playerStatComponent = ref playerStatService.GetPlayerStat();
+            
+            if(playerStatComponent.HealthScore>0)
+                AdjustDifficultyBasedOnPlayerPerformance();
+            else{
+                // ask user to buy health
+                 IAPButton.SetActive(true);
+            }
         }
 
         private void AdjustDifficultyBasedOnPlayerPerformance()
@@ -105,10 +120,78 @@ namespace AmazingTrack
             
         }
 
+        /// <summary>
+        /// This function is called when the object becomes enabled and active.
+        /// </summary>
+        
+        void OnEnable()
+        {
+            // UnityAdsManager.Instance.LoadRewardedVideo();
+            // UnityAdsManager.Instance.LoadInterstitial();
+
+            
+            IAPButton.SetActive(false);
+            RewardHealthButton.SetActive(false);
+            //if(UnityAdsManager.Instance.IsRewardedVideoReady())
+            GoogleAdsManager.Instance.OnRewardedAdLoaded += OnRewardedVideoReady;
+            GoogleAdsManager.Instance.OnRewardedAdRewarded += OnRewardedVideoCompleted;
+            
+            
+            // UnityAdsManager.Instance.OnRewardedVideoAvailable += OnRewardedVideoReady;
+            // UnityAdsManager.Instance.OnRewardedVideoCompleted += OnRewardedVideoCompleted;
+        }
+
+        /// <summary>
+        /// Start is called on the frame when a script is enabled just before
+        /// any of the Update methods is called the first time.
+        /// </summary>
+        void Start()
+        {
+            ref var playerStatComponent = ref playerStatService.GetPlayerStat();
+            GoogleAdsManager.Instance.LoadRewardedAd();
+            if(playerStatComponent.HealthScore <= 2)
+            {
+                if(GoogleAdsManager.Instance.IsRewardedVideoReady())
+                {
+                    RewardHealthButton.SetActive(true);
+                }
+            }
+            
+        }
+
+        private void OnRewardedVideoReady()
+        {
+            ref var playerStatComponent = ref playerStatService.GetPlayerStat();
+            if(playerStatComponent.HealthScore <= 2)
+            {
+                RewardHealthButton.SetActive(true);
+            }
+        }
+
+        public void OnRewardHealthButtonClick()
+        {
+            // UnityAdsManager.Instance.ShowRewardedVideo();
+            GoogleAdsManager.Instance.ShowRewardedAd();
+        }
+
+        public void OnRewardedVideoCompleted(){
+            ref var playerStatComponent = ref playerStatService.GetPlayerStat();
+            playerStatComponent.HealthScore+=2;
+        }
+
+        private void OnDisable()
+        {
+            GoogleAdsManager.Instance.OnRewardedAdLoaded -= OnRewardedVideoReady;
+            GoogleAdsManager.Instance.OnRewardedAdRewarded -= OnRewardedVideoCompleted;
+            // UnityAdsManager.Instance.OnRewardedVideoAvailable -= OnRewardedVideoReady;
+            // UnityAdsManager.Instance.OnRewardedVideoCompleted -= OnRewardedVideoCompleted;
+        }
+
         private void Update() {
             ref var playerStatComponent = ref playerStatService.GetPlayerStat();
             coinText.text = "" + playerStatComponent.TotalCrystalScore;
             healthText.text = "" + playerStatComponent.HealthScore;
         }
+    
     }
 }

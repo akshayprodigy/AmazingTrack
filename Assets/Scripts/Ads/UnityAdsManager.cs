@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 using System.Collections.Generic;
 
 public class UnityAdsManager : MonoBehaviour
@@ -6,6 +7,10 @@ public class UnityAdsManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public static UnityAdsManager Instance { get; private set; }
 
+    // Events for ad completion
+    public event Action OnRewardedVideoAvailable;
+    public event Action OnRewardedVideoCompleted;
+    public event Action OnRewardedVideoClosedWithoutReward;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
@@ -22,8 +27,8 @@ public class UnityAdsManager : MonoBehaviour
     
     void Start()
     {
-        #if UNITY_ANDROID
-        string appKey = "85460dcd"; // Replace with your own app key 1fee20f75
+#if UNITY_ANDROID
+        string appKey = "1fee20f75"; // Replace with your own app key 1fee20f75
 #elif UNITY_IPHONE
         string appKey = "8545d445";
 #else
@@ -97,11 +102,20 @@ public class UnityAdsManager : MonoBehaviour
     void RewardedVideoOnAdClosedEvent(IronSourceAdInfo adInfo)
     {
         Debug.Log("unity-script: I got RewardedVideoOnAdClosedEvent With AdInfo " + adInfo);
+        // if (adInfo.)
+        // {
+        //     OnRewardedVideoCompleted?.Invoke();
+        // }
+        // else
+        // {
+        //     OnRewardedVideoClosedWithoutReward?.Invoke();
+        // }
     }
 
     void RewardedVideoOnAdAvailable(IronSourceAdInfo adInfo)
     {
         Debug.Log("unity-script: I got RewardedVideoOnAdAvailable With AdInfo " + adInfo);
+        OnRewardedVideoAvailable?.Invoke();
     }
 
     void RewardedVideoOnAdUnavailable()
@@ -117,6 +131,9 @@ public class UnityAdsManager : MonoBehaviour
     void RewardedVideoOnAdRewardedEvent(IronSourcePlacement ironSourcePlacement, IronSourceAdInfo adInfo)
     {
         Debug.Log("unity-script: I got RewardedVideoOnAdRewardedEvent With Placement" + ironSourcePlacement + "And AdInfo " + adInfo);
+        // ssp.getPlacementName();
+        // ssp.getRewardName();
+        // ssp.getRewardAmount();
     }
 
     void RewardedVideoOnAdClickedEvent(IronSourcePlacement ironSourcePlacement, IronSourceAdInfo adInfo)
@@ -178,14 +195,14 @@ public class UnityAdsManager : MonoBehaviour
     #endregion
     // Update is called once per frame
         public void ShowRewardedVideo(){
-                if (IronSource.Agent.isRewardedVideoAvailable())
-                {
-                        IronSource.Agent.showRewardedVideo();
-                }
-                else
-                {
-                        Debug.Log("unity-script: IronSource.Agent.isRewardedVideoAvailable - False");
-                }
+            if (IronSource.Agent.isRewardedVideoAvailable())
+            {
+                    IronSource.Agent.showRewardedVideo();
+            }
+            else
+            {
+                    Debug.Log("unity-script: IronSource.Agent.isRewardedVideoAvailable - False");
+            }
         }
 
         public void ShowInterstitial(){
@@ -198,4 +215,30 @@ public class UnityAdsManager : MonoBehaviour
                         Debug.Log("unity-script: IronSource.Agent.isInterstitialReady - False");
                 }
         }
+
+// New functions for loading ads and checking availability
+    public void LoadRewardedVideo()
+    {
+        Debug.Log("unity-script: Loading rewarded video");
+        if(!IronSource.Agent.isRewardedVideoAvailable())
+            IronSource.Agent.loadRewardedVideo();
+    }
+
+    public void LoadInterstitial()
+    {
+        Debug.Log("unity-script: Loading interstitial");
+        if(!IronSource.Agent.isInterstitialReady())
+            IronSource.Agent.loadInterstitial();
+    }
+
+    public bool IsRewardedVideoReady()
+    {
+        return IronSource.Agent.isRewardedVideoAvailable();
+    }
+
+    public bool IsInterstitialReady()
+    {
+        return IronSource.Agent.isInterstitialReady();
+    }
+
 }

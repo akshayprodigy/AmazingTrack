@@ -14,12 +14,18 @@ namespace AmazingTrack
         [SerializeField] Text scoreText;
         [SerializeField] TextMeshProUGUI coinText;
         [SerializeField] TextMeshProUGUI healthText;
+        [SerializeField] GameObject RewardButton;
 
+        [SerializeField] GameObject RewardLiveButton;
+        private int gameEndCount = 0;
+        private bool isRevive = false;
         
         private void OnEnable()
         {
+            gameEndCount++;
             ref var playerStatComponent = ref playerStatService.GetPlayerStat();
-            
+            RewardButton.SetActive(false);
+            RewardLiveButton.SetActive(false);
             string text = "Your score: " + playerStatComponent.Score;
             bool newRecord = playerStatComponent.Score == playerStatComponent.HighScore;
             if (newRecord)
@@ -32,17 +38,76 @@ namespace AmazingTrack
 
             coinText.text = "" + playerStatComponent.TotalCrystalScore;
             healthText.text = "" + playerStatComponent.HealthScore;
+
+            if(GoogleAdsManager.Instance.IsRewardedVideoReady()){
+                RewardButton.SetActive(true);
+            }
+            GoogleAdsManager.Instance.OnRewardedAdRewarded += OnRewardedVideoCompleted;
+             // Show interstitial ad after the first 3 instances and then after every 2 instances
+            if (gameEndCount == 3 || (gameEndCount > 3 && (gameEndCount - 3) % 2 == 0))
+            {
+                // if (UnityAdsManager.Instance.IsInterstitialReady())
+                // {
+                //     UnityAdsManager.Instance.ShowInterstitial();
+                // }
+            }
+        }
+
+        /// <summary>
+        /// This function is called when the behaviour becomes disabled or inactive.
+        /// </summary>
+        void OnDisable()
+        {
+            GoogleAdsManager.Instance.OnRewardedAdRewarded -= OnRewardedVideoCompleted;
+        }
+
+
+        public void OnRewardedVideoCompleted()
+        {
+            
+            
+            ref var playerStatComponent = ref playerStatService.GetPlayerStat();
+            // TODO add coids to Total Coins
+            if(isRevive){
+                RewardLiveButton.SetActive(false);
+                playerStatComponent.HealthScore+=2;
+            }else{
+                RewardButton.SetActive(false);
+                playerStatComponent.TotalCrystalScore += playerStatComponent.CrystalScore;
+                coinText.text = "" + playerStatComponent.TotalCrystalScore;
+                //  add sfx effect for 2x reward
+            }
+           
+           
+
+        }
+
+        public void OnRewardButtonClick(){
+            GoogleAdsManager.Instance.ShowRewardedAd();
+        }
+
+        public void OnRewardLifeButtonClick(){
+            isRevive = true;
+            GoogleAdsManager.Instance.ShowRewardedAd();
         }
 
         public void OnRestartButton()
         {
                 ref var playerStatComponent = ref playerStatService.GetPlayerStat();
-                playerStatComponent.HealthScore--;
+                
                 if (playerStatComponent.HealthScore <= 0)
                 {
                     // Show video ads to buy health points or show game over screen
+                    if(GoogleAdsManager.Instance.IsRewardedVideoReady()){
+                        RewardLiveButton.SetActive(true);
+                    }
+
                 }else{
+                    Debug.Log("Restarting game: " + playerStatComponent.HealthScore);
+                    
+                    Debug.Log("Restarting game: " + playerStatComponent.HealthScore);
                    AdjustDifficultyBasedOnPlayerPerformance();
+                   playerStatComponent.HealthScore--;
                 }
         }
 

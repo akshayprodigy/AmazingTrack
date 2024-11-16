@@ -121,11 +121,20 @@ namespace AmazingTrack
                     break;
                 case GameState.GameOver:
                     gameStateComponent.GameOverTimer -= Time.deltaTime;
-                    if (gameStateComponent.GameOverTimer <= 0){
-                        gameStateComponent.ReviveTimer = 10.0f;
-                        ChangeState(GameState.Revive);  
+                    if (gameStateComponent.GameOverTimer <= 0 ){
+
+                        if((GoogleAdsManager.Instance.IsRewardedVideoReady() || 
+                            playerStatService.GetPlayerStat().TotalCrystalScore >= playerStatService.RetryCrystals) && playerStatService.GetPlayerStat().IsGameFromClicked)
+                        {
+                            gameStateComponent.ReviveTimer = 10.0f;
+                            ChangeState(GameState.Revive);  
+                        }
+                        else{
+                            ChangeState(GameState.GameEnd);
+                        }
+                        
                     }
-                        // ChangeState(GameState.GameEnd);
+                    
                     break;
                 case GameState.GameEnd:
                 {    

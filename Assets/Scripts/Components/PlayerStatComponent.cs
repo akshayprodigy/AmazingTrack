@@ -16,6 +16,8 @@
         public int GamesPlayed; 
 
         public int GameModeCount;
+
+        public bool IsGameFromClicked;
         public GameMode LastGameMode;
 
     }

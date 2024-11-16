@@ -10,6 +10,8 @@ namespace AmazingTrack
         public const int ScoreForCrystal = 10;
         public const int ScoreForStep = 1;
         private const int ScoreForNextLevel = 100;
+
+        public int RetryCrystals = 50;
         
         private readonly EcsPool<PlayerStatComponent> playerStatPool;
         private readonly EcsPool<PlayerLevelUpComponent> playerLevelUpPool;
@@ -171,7 +173,7 @@ namespace AmazingTrack
                 playerStatComponent.TotalCrystalScore = PlayerPrefs.GetInt("Tap2Dash_TotalCrystal",0);
 
             //if (PlayerPrefs.HasKey("Tap2Dash_Health"))
-                playerStatComponent.HealthScore = PlayerPrefs.GetInt("Tap2Dash_Health",50);
+                playerStatComponent.HealthScore = PlayerPrefs.GetInt("Tap2Dash_Health",5);
 
             //if(PlayerPrefs.HasKey("Tap2Dash_GamesPlayed"))
                 playerStatComponent.GamesPlayed = PlayerPrefs.GetInt("Tap2Dash_GamesPlayed",0);
