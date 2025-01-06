@@ -102,7 +102,7 @@ public class GoogleAdsManager : MonoBehaviour
     }
 
     public bool IsRewardedVideoReady(){
-        return _rewardedAd != null;
+        return (_rewardedAd != null && _rewardedAd.CanShowAd());
     }
 
     public void ShowRewardedAd()
@@ -223,6 +223,11 @@ public class GoogleAdsManager : MonoBehaviour
             // AdLoadedStatus?.SetActive(false);
         }
 
+        public bool IsInterstitialAdReady()
+        {
+            return (_interstitialAd != null && _interstitialAd.CanShowAd());
+        }
+
         public void InterstitialDestroyAd()
         {
             if (_interstitialAd != null)
@@ -264,16 +269,20 @@ public class GoogleAdsManager : MonoBehaviour
             ad.OnAdFullScreenContentClosed += () =>
             {
                 Debug.Log("Interstitial ad full screen content closed.");
+                InterstitialLoadAd();
+
             };
             // Raised when the ad failed to open full screen content.
             ad.OnAdFullScreenContentFailed += (AdError error) =>
             {
                 Debug.LogError("Interstitial ad failed to open full screen content with error : "
                     + error);
+                InterstitialLoadAd();
             };
         }
     
 
     #endregion
+
 
 }

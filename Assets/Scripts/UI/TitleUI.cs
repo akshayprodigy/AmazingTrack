@@ -72,8 +72,7 @@ namespace AmazingTrack
 
         public void OnPlayButtonClick()
         {
-            // UnityAdsManager.Instance.LoadRewardedVideo();
-            // UnityAdsManager.Instance.LoadInterstitial();
+            
             ref var playerStatComponent = ref playerStatService.GetPlayerStat();
             
             if(playerStatComponent.HealthScore>0)
@@ -126,19 +125,14 @@ namespace AmazingTrack
         
         void OnEnable()
         {
-            // UnityAdsManager.Instance.LoadRewardedVideo();
-            // UnityAdsManager.Instance.LoadInterstitial();
+            
 
             
             IAPButton.SetActive(false);
             RewardHealthButton.SetActive(false);
-            //if(UnityAdsManager.Instance.IsRewardedVideoReady())
             GoogleAdsManager.Instance.OnRewardedAdLoaded += OnRewardedVideoReady;
             GoogleAdsManager.Instance.OnRewardedAdRewarded += OnRewardedVideoCompleted;
             
-            
-            // UnityAdsManager.Instance.OnRewardedVideoAvailable += OnRewardedVideoReady;
-            // UnityAdsManager.Instance.OnRewardedVideoCompleted += OnRewardedVideoCompleted;
         }
 
         /// <summary>
@@ -149,6 +143,8 @@ namespace AmazingTrack
         {
             ref var playerStatComponent = ref playerStatService.GetPlayerStat();
             GoogleAdsManager.Instance.LoadRewardedAd();
+            GoogleAdsManager.Instance.InterstitialLoadAd();
+
             if(playerStatComponent.HealthScore <= 2)
             {
                 if(GoogleAdsManager.Instance.IsRewardedVideoReady())
@@ -170,7 +166,6 @@ namespace AmazingTrack
 
         public void OnRewardHealthButtonClick()
         {
-            // UnityAdsManager.Instance.ShowRewardedVideo();
             GoogleAdsManager.Instance.ShowRewardedAd();
         }
 
@@ -183,8 +178,6 @@ namespace AmazingTrack
         {
             GoogleAdsManager.Instance.OnRewardedAdLoaded -= OnRewardedVideoReady;
             GoogleAdsManager.Instance.OnRewardedAdRewarded -= OnRewardedVideoCompleted;
-            // UnityAdsManager.Instance.OnRewardedVideoAvailable -= OnRewardedVideoReady;
-            // UnityAdsManager.Instance.OnRewardedVideoCompleted -= OnRewardedVideoCompleted;
         }
 
         private void Update() {
