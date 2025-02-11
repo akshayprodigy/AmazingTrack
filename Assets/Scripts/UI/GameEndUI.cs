@@ -2,8 +2,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
-using System.Collections;
-using System.IO;
 
 namespace AmazingTrack
 {
@@ -21,12 +19,6 @@ namespace AmazingTrack
         [SerializeField] GameObject RewardLiveButton;
         private int gameEndCount = 0;
         private bool isRevive = false;
-
-        private string shareText = "Check out my high score! #MyHighScore";
-        private string playStoreLink = "https://play.google.com/store/apps/details?id=com.yourcompany.yourgame";
-        private string screenshotPath;
-
-        public Image screenshotPreview;
         
         private void OnEnable()
         {
@@ -36,10 +28,8 @@ namespace AmazingTrack
             RewardLiveButton.SetActive(false);
             string text = "Your score: " + playerStatComponent.Score;
             bool newRecord = playerStatComponent.Score == playerStatComponent.HighScore;
-            if (newRecord){
+            if (newRecord)
                 text += "\nNew record !";
-                StartCoroutine(TakeScreenshot());
-            }
             else
                 text += "\nHigh score: " + playerStatComponent.HighScore;
 
@@ -56,9 +46,10 @@ namespace AmazingTrack
              // Show interstitial ad after the first 3 instances and then after every 2 instances
             if (gameEndCount == 3 || (gameEndCount > 3 && (gameEndCount - 3) % 2 == 0))
             {
-                if(GoogleAdsManager.Instance.IsInterstitialAdReady()){
-                    GoogleAdsManager.Instance.InterstitialShowAd();
-                }
+                // if (UnityAdsManager.Instance.IsInterstitialReady())
+                // {
+                //     UnityAdsManager.Instance.ShowInterstitial();
+                // }
             }
         }
 
@@ -70,8 +61,10 @@ namespace AmazingTrack
             GoogleAdsManager.Instance.OnRewardedAdRewarded -= OnRewardedVideoCompleted;
         }
 
+
         public void OnRewardedVideoCompleted()
         {
+            
             
             ref var playerStatComponent = ref playerStatService.GetPlayerStat();
             // TODO add coids to Total Coins
@@ -84,58 +77,11 @@ namespace AmazingTrack
                 coinText.text = "" + playerStatComponent.TotalCrystalScore;
                 //  add sfx effect for 2x reward
             }
+           
+           
 
         }
 
-         IEnumerator TakeScreenshot()
-        {
-            yield return new WaitForEndOfFrame();
-            
-            Texture2D screenshot = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
-            screenshot.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
-            screenshot.Apply();
-
-            byte[] bytes = screenshot.EncodeToPNG();
-            Destroy(screenshot);
-
-            screenshotPath = Path.Combine(Application.temporaryCachePath, "screenshot.png");
-            File.WriteAllBytes(screenshotPath, bytes);
-
-            Debug.Log("Screenshot saved to: " + screenshotPath);
-
-            // Display the screenshot in the UI
-            Texture2D previewTexture = new Texture2D(2, 2);
-            previewTexture.LoadImage(bytes);
-            screenshotPreview.sprite = Sprite.Create(previewTexture, new Rect(0, 0, previewTexture.width, previewTexture.height), new Vector2(0.5f, 0.5f));
-        }
-
-
-        public void OnShareButtonPressed()
-        {
-            if (!string.IsNullOrEmpty(screenshotPath))
-            {
-                StartCoroutine(ShareScreenshot());
-            }
-            else
-            {
-                Debug.LogError("Screenshot not taken yet.");
-            }
-        }
-
-        IEnumerator ShareScreenshot()
-        {
-            yield return new WaitForEndOfFrame();
-            
-            string shareSubject = "I just reached a new high score!";
-            string shareMessage = shareText + "\nCheck out the game here: " + playStoreLink;
-
-            // new NativeShare()
-            //     .AddFile(screenshotPath)
-            //     .SetSubject(shareSubject)
-            //     .SetText(shareMessage)
-            //     .Share();
-        }
-        
         public void OnRewardButtonClick(){
             GoogleAdsManager.Instance.ShowRewardedAd();
         }
@@ -155,8 +101,8 @@ namespace AmazingTrack
                     if(GoogleAdsManager.Instance.IsRewardedVideoReady()){
                         RewardLiveButton.SetActive(true);
                     }
-
-                }else{
+                }
+                else{
                     Debug.Log("Restarting game: " + playerStatComponent.HealthScore);
                     
                     Debug.Log("Restarting game: " + playerStatComponent.HealthScore);
@@ -165,7 +111,7 @@ namespace AmazingTrack
                 }
         }
 
-        public void OnEasyButtonClick()
+         public void OnEasyButtonClick()
         {
             gameSystem.GameStartToRecreate(GameMode.Easy);
             ref var playerStatComponent = ref playerStatService.GetPlayerStat();
